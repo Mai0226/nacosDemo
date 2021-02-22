@@ -1,8 +1,11 @@
 package com.max.userrest.config;
 
 import com.alibaba.druid.pool.DruidDataSource;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -17,39 +20,21 @@ import javax.sql.DataSource;
 @Configuration
 @ConditionalOnProperty(name="ejlerp.dts.useDb", havingValue="true")
 public class YunDingDataSourceConfig {
-    @Bean
-    public DataSource getDataSource(@Value("${spring.datasource.type:}") String type,
-                                    @Value("${spring.datasource.driver-class-name:}") String driverClassName,
-                                    @Value("${spring.datasource.url:}") String url,
-                                    @Value("${spring.datasource.username:}") String username,
-                                    @Value("${spring.datasource.password:}") String password,
-                                    @Value("${spring.datasource.initialSize:}") Integer initialSize,
-                                    @Value("${spring.datasource.minIdle:}") Integer minIdle,
-                                    @Value("${spring.datasource.maxActive:}") Integer maxActive,
-                                    @Value("${spring.datasource.maxWait:}") Integer maxWait,
-                                    @Value("${spring.datasource.timeBetweenEvictionRunsMillis:}") Integer timeBetweenEvictionRunsMillis,
-                                    @Value("${spring.datasource.minEvictableIdleTimeMillis:}") Integer minEvictableIdleTimeMillis,
-                                    @Value("${spring.datasource.validationQuery:}") String validationQuery,
-                                    @Value("${spring.datasource.connectionProperties:}") String connectionProperties) {
+    @Bean(name = "masterDataSource")
+    @Qualifier("masterDataSource")
+    @ConfigurationProperties(prefix="spring.datasource.master")
+    public DataSource jiaoguanjuDataSource() {
+        return DataSourceBuilder.create().build();
+    }
 
-        DruidDataSource def = new DruidDataSource();
-        def.setDriverClassName(driverClassName);
-        def.setUrl(url);
-        def.setUsername(username);
-        def.setPassword(password);
-        def.setInitialSize(initialSize);
-        def.setMinIdle(minIdle);
-        def.setMaxActive(maxActive);
-        def.setMaxWait(maxWait);
-        def.setTimeBetweenEvictionRunsMillis(timeBetweenEvictionRunsMillis);
-        def.setMinEvictableIdleTimeMillis(minEvictableIdleTimeMillis);
-        def.setValidationQuery(validationQuery);
-        def.setTestWhileIdle(true);
-        def.setTestOnBorrow(false);
-        def.setTestOnReturn(false);
-        def.setPoolPreparedStatements(true);
-        def.setConnectionProperties(connectionProperties);
-        return def;
+    /**
+     *  广州数据源
+     */
+    @Bean(name = "slaveDataSource")
+    @Qualifier("slaveDataSource")
+    @ConfigurationProperties(prefix="spring.datasource.slave")
+    public DataSource guangzhouDataSource() {
+        return DataSourceBuilder.create().build();
     }
 }
 
